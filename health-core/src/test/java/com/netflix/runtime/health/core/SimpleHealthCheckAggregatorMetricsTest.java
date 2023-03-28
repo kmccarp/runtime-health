@@ -44,31 +44,19 @@ public class SimpleHealthCheckAggregatorMetricsTest {
         this.registry = new DefaultRegistry();
     }
     
-    static HealthIndicator nonResponsive = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-        }
+    static HealthIndicator nonResponsive = healthCallback -> {
     };
         
-    static HealthIndicator exceptional = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            throw new RuntimeException("Boom");
-        }
+    static HealthIndicator exceptional = healthCallback -> {
+        throw new RuntimeException("Boom");
     };
 
-    static HealthIndicator unhealthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.unhealthy().build());
-        }
+    static HealthIndicator unhealthy = healthCallback -> {
+        healthCallback.inform(Health.unhealthy().build());
     };
 
-    static HealthIndicator healthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.healthy().build());
-        }
+    static HealthIndicator healthy = healthCallback -> {
+        healthCallback.inform(Health.healthy().build());
     };
     
     @Test(timeout=1000)
