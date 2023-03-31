@@ -34,18 +34,12 @@ import com.netflix.runtime.health.api.HealthIndicatorCallback;
 
 public class HealthModuleTest {
 
-    static HealthIndicator healthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.healthy().build());
-        }
+    static HealthIndicator healthy = healthCallback -> {
+        healthCallback.inform(Health.healthy().build());
     };
     
-    static HealthIndicator unhealthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.unhealthy().build());
-        }
+    static HealthIndicator unhealthy = healthCallback -> {
+        healthCallback.inform(Health.unhealthy().build());
     };
     
     @Test
