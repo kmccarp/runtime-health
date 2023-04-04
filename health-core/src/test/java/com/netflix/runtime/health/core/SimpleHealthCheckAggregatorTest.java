@@ -38,31 +38,19 @@ public class SimpleHealthCheckAggregatorTest {
 	
 	SimpleHealthCheckAggregator aggregator;
 	
-    static HealthIndicator nonResponsive = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-        }
+    static HealthIndicator nonResponsive = healthCallback -> {
     };
 	    
-    static HealthIndicator exceptional = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            throw new RuntimeException("Boom");
-        }
+    static HealthIndicator exceptional = healthCallback -> {
+        throw new RuntimeException("Boom");
     };
 
-    static HealthIndicator unhealthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.unhealthy().build());
-        }
+    static HealthIndicator unhealthy = healthCallback -> {
+        healthCallback.inform(Health.unhealthy().build());
     };
 
-    static HealthIndicator healthy = new HealthIndicator() {
-        @Override
-        public void check(HealthIndicatorCallback healthCallback) {
-            healthCallback.inform(Health.healthy().build());
-        }
+    static HealthIndicator healthy = healthCallback -> {
+        healthCallback.inform(Health.healthy().build());
     };
 	
 	@Test(timeout=1000)
@@ -127,8 +115,8 @@ public class SimpleHealthCheckAggregatorTest {
 	@Test(timeout=1000)
 	public void testWithDetails() throws Exception {
 		aggregator = new SimpleHealthCheckAggregator(Arrays.asList( 
-				(callback)->callback.inform(Health.healthy().withDetail("foo", "bar").build()),
-				(callback)->callback.inform(Health.unhealthy(new RuntimeException("Boom")).build())), 1, TimeUnit.SECONDS);
+				callback->callback.inform(Health.healthy().withDetail("foo", "bar").build()),
+				callback->callback.inform(Health.unhealthy(new RuntimeException("Boom")).build())), 1, TimeUnit.SECONDS);
 		HealthCheckStatus aggregatedHealth = aggregator.check().get();
 		assertFalse(aggregatedHealth.isHealthy());
 		assertEquals(2, aggregatedHealth.getHealthResults().size());
