@@ -27,59 +27,59 @@ public class IndicatorMatchersTest {
             healthCallback.inform(Health.healthy().build());
         }
     }
-    
+
     private static class B implements HealthIndicator {
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.healthy().build());
         }
     }
-    
+
     private static class C implements HealthIndicator {
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.healthy().build());
         }
     }
-    
+
     @Test
     public void testEmpty() {
         assertTrue(IndicatorMatchers.build().matches(new A()));
     }
-    
+
     @Test
     public void testInclude() {
         assertTrue(IndicatorMatchers.includes(A.class.getName(), B.class.getName()).build().matches(new A()));
         assertTrue(IndicatorMatchers.includes(A.class.getName(), B.class.getName()).build().matches(new B()));
         assertFalse(IndicatorMatchers.includes(A.class.getName(), B.class.getName()).build().matches(new C()));
     }
-    
+
     @Test
     public void testAdditiveInclude() {
         assertTrue(IndicatorMatchers.includes(A.class.getName()).includes(B.class.getName()).build().matches(new A()));
         assertTrue(IndicatorMatchers.includes(A.class.getName()).includes(B.class.getName()).build().matches(new B()));
         assertFalse(IndicatorMatchers.includes(A.class.getName()).includes(B.class.getName()).build().matches(new C()));
     }
-    
+
     @Test
     public void testExclude() {
         assertFalse(IndicatorMatchers.excludes(A.class.getName(), B.class.getName()).build().matches(new A()));
         assertFalse(IndicatorMatchers.excludes(A.class.getName(), B.class.getName()).build().matches(new B()));
         assertTrue(IndicatorMatchers.excludes(A.class.getName(), B.class.getName()).build().matches(new C()));
     }
-    
+
     @Test
     public void testAdditiveExclude() {
         assertFalse(IndicatorMatchers.excludes(A.class.getName()).excludes(B.class.getName()).build().matches(new A()));
         assertFalse(IndicatorMatchers.excludes(A.class.getName()).excludes(B.class.getName()).build().matches(new B()));
         assertTrue(IndicatorMatchers.excludes(A.class.getName()).excludes(B.class.getName()).build().matches(new C()));
     }
-    
+
     @Test
     public void testIncludesAndExcludes() {
         assertTrue(IndicatorMatchers.includes(A.class.getName()).excludes(B.class.getName()).build().matches(new A()));
         assertFalse(IndicatorMatchers.includes(A.class.getName()).excludes(B.class.getName()).build().matches(new B()));
         assertFalse(IndicatorMatchers.includes(A.class.getName()).excludes(B.class.getName()).build().matches(new C()));
     }
-    
+
     @Test
     public void testExcludeBeatsInclude() {
         assertFalse(IndicatorMatchers.includes(A.class.getName()).excludes(A.class.getName()).build().matches(new A()));

@@ -30,7 +30,7 @@ import com.netflix.runtime.health.api.HealthIndicatorCallback;
 
 public class DefaultCachingHealthCheckAggregatorTest {
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testCachedIndicatorNameNotHidden() throws Exception {
         DefaultCachingHealthCheckAggregator aggregator = new DefaultCachingHealthCheckAggregator(
                 Arrays.asList(new TestHealthIndicator()), 1, TimeUnit.SECONDS, 1, TimeUnit.SECONDS, null);
@@ -39,8 +39,8 @@ public class DefaultCachingHealthCheckAggregatorTest {
         assertEquals(1, aggregatedHealth.getHealthResults().size());
         assertEquals(TestHealthIndicator.class.getName(), aggregatedHealth.getHealthResults().get(0).getDetails().get("className"));
     }
-    
-    private static class TestHealthIndicator implements HealthIndicator { 
+
+    private static class TestHealthIndicator implements HealthIndicator {
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.healthy().build());
         }

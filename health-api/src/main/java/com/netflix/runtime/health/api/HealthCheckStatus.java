@@ -33,7 +33,7 @@ public class HealthCheckStatus {
         this.healthResults = new ArrayList<>(indicators);
         this.suppressedHealthResults = new ArrayList<>();
     }
-    
+
     public HealthCheckStatus(boolean isHealthy, List<Health> indicators, List<Health> suppressedIndicators) {
         this.isHealthy = isHealthy;
         this.healthResults = new ArrayList<>(indicators);
@@ -50,7 +50,7 @@ public class HealthCheckStatus {
     public List<Health> getHealthResults() {
         return healthResults;
     }
-    
+
     /**
      * Health results returned by instances of {@link HealthIndicator} but suppressed by an {@link IndicatorMatcher}.
      */
@@ -61,11 +61,11 @@ public class HealthCheckStatus {
     public static HealthCheckStatus create(boolean isHealthy, List<Health> indicators) {
         return new HealthCheckStatus(isHealthy, indicators);
     }
-    
+
     public static HealthCheckStatus create(boolean isHealthy, List<Health> indicators, List<Health> suppressedIndicators) {
         return new HealthCheckStatus(isHealthy, indicators, suppressedIndicators);
     }
-    
+
     @Override
     public String toString() {
         return "HealthCheckStatus[isHealthy=" + isHealthy + ", indicators=" + healthResults + ", + suppressedIndicators=" + suppressedHealthResults + "]";

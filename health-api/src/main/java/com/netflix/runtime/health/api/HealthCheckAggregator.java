@@ -26,7 +26,7 @@ public interface HealthCheckAggregator {
      * Invoke all configured {@link HealthIndicator} instances and return the overall health.
      */
     CompletableFuture<HealthCheckStatus> check();
-    
+
     /**
      * Invoke all configured {@link HealthIndicator} instances and return the overall health.
      * {@link HealthIndicator}s not matched by the provided {@link IndicatorMatcher} will be reported

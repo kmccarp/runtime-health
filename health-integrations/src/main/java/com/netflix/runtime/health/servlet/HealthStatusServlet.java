@@ -31,22 +31,22 @@ import com.netflix.runtime.health.status.ArchaiusHealthStatusFilterModule;
 
 @Singleton
 public final class HealthStatusServlet extends HttpServlet {
-    
+
     private static final long serialVersionUID = -6518168654611266480L;
     @Inject
     private HealthCheckAggregator healthCheckAggregator;
-    
+
     /***
      * See {@link ArchaiusHealthStatusFilterModule} for default implementation.
      */
-    @com.google.inject.Inject(optional=true)
+    @com.google.inject.Inject(optional = true)
     private IndicatorMatcher matcher;
-    
+
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, ServletException {
         HealthCheckStatus health;
         try {
-            if(matcher != null ) {
+            if (matcher != null) {
                 health = this.healthCheckAggregator.check(matcher).get();
             } else {
                 health = this.healthCheckAggregator.check().get();
@@ -54,11 +54,10 @@ public final class HealthStatusServlet extends HttpServlet {
         } catch (Exception e) {
             throw new ServletException(e);
         }
-        
-        if(health.isHealthy()) {
+
+        if (health.isHealthy()) {
             resp.setStatus(200);
-        }
-        else {
+        }else {
             resp.setStatus(500);
         }
         String content = health.toString();

@@ -24,7 +24,7 @@ import com.netflix.runtime.health.api.HealthCheckStatus;
  * See @{@link EventListener} for details on how to consume.
  */
 public class HealthCheckStatusChangedEvent implements ApplicationEvent {
-    
+
     private final HealthCheckStatus health;
 
     public HealthCheckStatusChangedEvent(HealthCheckStatus health) {
@@ -34,5 +34,5 @@ public class HealthCheckStatusChangedEvent implements ApplicationEvent {
     public HealthCheckStatus getHealth() {
         return health;
     }
-    
+
 }

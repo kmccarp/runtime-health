@@ -48,7 +48,7 @@ import com.netflix.spectator.api.Registry;
 /**
  */
 public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Closeable {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(SimpleHealthCheckAggregator.class);
     private static final int HEALTH_CHECK_EXECUTOR_POOL_SIZE = 3;
     private final List<HealthIndicator> indicators;
@@ -61,9 +61,9 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
     private final Optional<Registry> registry;
 
     public SimpleHealthCheckAggregator(List<HealthIndicator> indicators, long maxWaitTime, TimeUnit units) {
-	    this(indicators, maxWaitTime, units, null);
-	}
-    
+        this(indicators, maxWaitTime, units, null);
+    }
+
     public SimpleHealthCheckAggregator(List<HealthIndicator> indicators, long maxWaitTime, TimeUnit units,
             ApplicationEventDispatcher eventDispatcher) {
         this(indicators, maxWaitTime, units, eventDispatcher, null);
@@ -74,7 +74,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
         this.indicators = new ArrayList<>(indicators);
         this.maxWaitTime = maxWaitTime;
         this.units = units;
-        this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {  
+        this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r, "healthIndicatorMonitor");
@@ -82,7 +82,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
                 return thread;
             }
         });
-        this.healthCheckExecutor = Executors.newFixedThreadPool(HEALTH_CHECK_EXECUTOR_POOL_SIZE, new ThreadFactory() {  
+        this.healthCheckExecutor = Executors.newFixedThreadPool(HEALTH_CHECK_EXECUTOR_POOL_SIZE, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r, "healthIndicatorExecutor");
@@ -94,7 +94,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
         this.previousHealth = new AtomicBoolean();
         this.registry = Optional.ofNullable(registry);
     }
-    
+
     @Override
     public CompletableFuture<HealthCheckStatus> check() {
         return check(IndicatorMatchers.build());
@@ -104,7 +104,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
         final List<HealthIndicatorCallbackImpl> callbacks = new ArrayList<>(indicators.size());
         final CompletableFuture<HealthCheckStatus> future = new CompletableFuture<HealthCheckStatus>();
         final AtomicInteger counter = new AtomicInteger(indicators.size());
-        
+
         if (eventDispatcher != null) {
             future.whenComplete((h, e) -> {
                 if (h != null && previousHealth.compareAndSet(!h.isHealthy(), h.isHealthy())) {
@@ -112,7 +112,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
                 }
             });
         }
-        
+
         List<CompletableFuture<?>> futures = indicators.stream().map(indicator -> {
 
             HealthIndicatorCallbackImpl callback = new HealthIndicatorCallbackImpl(indicator, !matcher.matches(indicator)) {
@@ -126,7 +126,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
             };
 
             callbacks.add(callback);
-      
+
             return CompletableFuture.runAsync(() -> {
                 try {
                     indicator.check(callback);
@@ -134,13 +134,13 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
                     callback.inform(Health.unhealthy(ex).build());
                 }
             }, healthCheckExecutor);
-            
+
         }).collect(Collectors.toList());
-                
-        if(indicators.size() == 0) {
-        	future.complete(HealthCheckStatus.create(true, Collections.emptyList()));
+
+        if (indicators.size() == 0) {
+            future.complete(HealthCheckStatus.create(true, Collections.emptyList()));
         }
-        
+
         if (maxWaitTime != 0 && units != null) {
             scheduledExecutor.schedule(new Runnable() {
                 @Override
@@ -153,7 +153,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
 
         return doWithFuture(future);
     }
-    
+
     protected CompletableFuture<HealthCheckStatus> doWithFuture(CompletableFuture<HealthCheckStatus> future) {
         return future.whenComplete((status, error) -> {
             if (status.getHealthResults().stream().filter(s -> s.getErrorMessage().orElse("").contains(TimeoutException.class.getName())).count() > 0) {
@@ -165,52 +165,52 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
         });
     }
 
-	protected HealthCheckStatus getStatusFromCallbacks(final List<HealthIndicatorCallbackImpl> callbacks) {
-	    List<Health> healths = new ArrayList<>();
-	    List<Health> suppressedHealths = new ArrayList<>();  
-	    boolean isHealthy = callbacks.stream()
-		    .map(callback -> {
-		    	Health health = Health.from(callback.getHealthOrTimeout())
-		    			.withDetail(Health.NAME_KEY, callback.getIndicator().getName()).build();
-		    	if(callback.isSuppressed()) {
-		    	    suppressedHealths.add(health);
-		    	    return Health.healthy().build();
-		    	} else {
-		    	    healths.add(health);
-		    	    return health;
-		    	}
-		    })
-		    .map(health -> health.isHealthy())
-		    .reduce(true, (a,b) -> a && b); 
-	    return HealthCheckStatus.create(isHealthy, healths, suppressedHealths);
-	}
-	     
+    protected HealthCheckStatus getStatusFromCallbacks(final List<HealthIndicatorCallbackImpl> callbacks) {
+        List<Health> healths = new ArrayList<>();
+        List<Health> suppressedHealths = new ArrayList<>();
+        boolean isHealthy = callbacks.stream()
+                .map(callback -> {
+                    Health health = Health.from(callback.getHealthOrTimeout())
+                            .withDetail(Health.NAME_KEY, callback.getIndicator().getName()).build();
+                    if (callback.isSuppressed()) {
+                        suppressedHealths.add(health);
+                        return Health.healthy().build();
+                    } else {
+                        healths.add(health);
+                        return health;
+                    }
+                })
+                .map(health -> health.isHealthy())
+                .reduce(true, (a, b) -> a && b);
+        return HealthCheckStatus.create(isHealthy, healths, suppressedHealths);
+    }
+
     abstract class HealthIndicatorCallbackImpl implements HealthIndicatorCallback {
         private volatile Health health;
         private final HealthIndicator indicator;
         private final boolean suppressed;
-        
+
         HealthIndicatorCallbackImpl(HealthIndicator indicator, boolean suppressed) {
             this.indicator = indicator;
             this.suppressed = suppressed;
         }
-        
+
         void setHealth(Health health) {
             this.health = health;
         }
-        
+
         public Health getHealthOrTimeout() {
-            return health != null 
-                ? health
-                : Health
+            return health != null
+                    ? health
+                    : Health
                     .unhealthy(new TimeoutException("Timed out waiting for response"))
                     .build();
         }
-        
+
         public HealthIndicator getIndicator() {
-        	return this.indicator;
+            return this.indicator;
         }
-        
+
         public boolean isSuppressed() {
             return this.suppressed;
         }

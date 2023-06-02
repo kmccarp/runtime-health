@@ -20,5 +20,5 @@ package com.netflix.runtime.health.api;
  * provide their view of {@link Health}
  */
 public interface HealthIndicatorCallback {
-	void inform(Health status);
+    void inform(Health status);
 }

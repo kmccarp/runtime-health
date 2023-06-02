@@ -38,7 +38,8 @@ import com.netflix.runtime.health.api.HealthIndicatorCallback;
 @RunWith(MockitoJUnitRunner.class)
 public class SimpleHealthCheckAggregatorEventsTest {
 
-    @Mock ApplicationEventDispatcher dispatcher;
+    @Mock
+    ApplicationEventDispatcher dispatcher;
     HealthIndicator changing;
 
     @Before
@@ -58,7 +59,7 @@ public class SimpleHealthCheckAggregatorEventsTest {
 
     @Test(timeout = 1000)
     public void testChangingHealthSendsFirstEventWhenNoListeners() throws Exception {
-        SimpleHealthCheckAggregator aggregator = new SimpleHealthCheckAggregator(Collections.emptyList(), 100, TimeUnit.SECONDS,dispatcher);
+        SimpleHealthCheckAggregator aggregator = new SimpleHealthCheckAggregator(Collections.emptyList(), 100, TimeUnit.SECONDS, dispatcher);
         HealthCheckStatus aggregatedHealth = aggregator.check().get();
         assertTrue(aggregatedHealth.isHealthy());
         assertEquals(0, aggregatedHealth.getHealthResults().size());
@@ -68,7 +69,7 @@ public class SimpleHealthCheckAggregatorEventsTest {
 
     @Test(timeout = 1000)
     public void testChangingHealthSendsEvent() throws Exception {
-        SimpleHealthCheckAggregator aggregator = new SimpleHealthCheckAggregator(Arrays.asList(changing), 100, TimeUnit.SECONDS,dispatcher);
+        SimpleHealthCheckAggregator aggregator = new SimpleHealthCheckAggregator(Arrays.asList(changing), 100, TimeUnit.SECONDS, dispatcher);
         HealthCheckStatus aggregatedHealth = aggregator.check().get();
         assertTrue(aggregatedHealth.isHealthy());
         assertEquals(1, aggregatedHealth.getHealthResults().size());

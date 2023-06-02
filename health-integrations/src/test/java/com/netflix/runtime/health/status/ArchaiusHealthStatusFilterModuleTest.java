@@ -38,29 +38,29 @@ public class ArchaiusHealthStatusFilterModuleTest {
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.healthy().build());
         }
-        
+
         @Override
         public String getName() {
             return "A";
         }
     }
-    
+
     private static class B implements HealthIndicator {
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.healthy().build());
         }
-        
+
         @Override
         public String getName() {
             return "B";
         }
     }
-    
+
     private LifecycleInjector injector;
     private SettableConfig config;
     private IndicatorMatcher matcher;
-   
-    
+
+
     @Before
     public void init() {
         injector = InjectorBuilder.fromModules(new ArchaiusModule(), new ArchaiusHealthStatusFilterModule()).createInjector();
@@ -73,37 +73,37 @@ public class ArchaiusHealthStatusFilterModuleTest {
         assertTrue(matcher.matches(new A()));
         assertTrue(matcher.matches(new B()));
     }
-    
+
     @Test
     public void testInclusion() {
         config.setProperty("health.status.indicators.include", "A");
         assertTrue(matcher.matches(new A()));
         assertFalse(matcher.matches(new B()));
-        
+
         config.setProperty("health.status.indicators.include", "B");
         assertFalse(matcher.matches(new A()));
         assertTrue(matcher.matches(new B()));
-        
+
         config.setProperty("health.status.indicators.include", "A,B");
         assertTrue(matcher.matches(new A()));
         assertTrue(matcher.matches(new B()));
     }
-    
+
     @Test
     public void testExclusion() {
         config.setProperty("health.status.indicators.exclude", "A");
         assertFalse(matcher.matches(new A()));
         assertTrue(matcher.matches(new B()));
-        
+
         config.setProperty("health.status.indicators.exclude", "B");
         assertTrue(matcher.matches(new A()));
         assertFalse(matcher.matches(new B()));
-        
+
         config.setProperty("health.status.indicators.exclude", "A,B");
         assertFalse(matcher.matches(new A()));
         assertFalse(matcher.matches(new B()));
     }
-    
+
     @Test
     public void testStringSplittingProducesNoWeirdEffects() {
         config.setProperty("health.status.indicators.exclude", ",,A,,");

@@ -31,51 +31,51 @@ import java.util.Optional;
  * </pre>
  */
 public class IndicatorMatchers {
-    
+
     public static IndicatorMatcherBuilder includes(String... indicatorNames) {
         return new IndicatorMatcherBuilder().includes(indicatorNames);
     }
-    
+
     public static IndicatorMatcherBuilder excludes(String... indicatorNames) {
         return new IndicatorMatcherBuilder().excludes(indicatorNames);
     }
-    
+
     public static IndicatorMatcher build() {
         return unused -> true;
     }
 
     public static class IndicatorMatcherBuilder {
-        
+
         public final List<String> includedIndicatorNames;
         public final List<String> excludedIndicatorNames;
-        
+
         public IndicatorMatcherBuilder() {
             this.includedIndicatorNames = new ArrayList<>();
             this.excludedIndicatorNames = new ArrayList<>();
         }
-        
+
         public IndicatorMatcherBuilder includes(String... indicatorNames) {
             if (indicatorNames != null) {
                 includedIndicatorNames.addAll(Arrays.asList(indicatorNames));
             }
             return this;
         }
-        
+
         public IndicatorMatcherBuilder excludes(String... indicatorNames) {
             if (indicatorNames != null) {
                 excludedIndicatorNames.addAll(Arrays.asList(indicatorNames));
             }
             return this;
         }
-        
+
         public IndicatorMatcher build() {
             return indicator -> {
                 return excludedIndicatorNames.stream().noneMatch(i -> indicator.getName().equals(i))
                         && (includedIndicatorNames.isEmpty()
-                                || includedIndicatorNames.stream().anyMatch(indicator.getName()::equals));
+                        || includedIndicatorNames.stream().anyMatch(indicator.getName()::equals));
             };
         }
-        
+
     }
 }
 

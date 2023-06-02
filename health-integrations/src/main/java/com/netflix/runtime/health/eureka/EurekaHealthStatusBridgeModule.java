@@ -60,11 +60,11 @@ public class EurekaHealthStatusBridgeModule extends AbstractModule {
         private Provider<HealthCheckAggregator> healthCheckAggregator;
         @Inject
         private Provider<EurekaClient> eurekaClient;
-        
+
         /***
          * See {@link com.netflix.runtime.health.status.ArchaiusHealthStatusFilterModule} for default implementation.
          */
-        @com.google.inject.Inject(optional=true)
+        @com.google.inject.Inject(optional = true)
         private IndicatorMatcher matcher;
 
         @PostConstruct
@@ -94,8 +94,8 @@ public class EurekaHealthStatusBridgeModule extends AbstractModule {
         @Override
         public void onStopped(Throwable error) {
         }
-    }   
-    
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj != null && getClass().equals(obj.getClass());

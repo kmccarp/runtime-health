@@ -43,7 +43,7 @@ public class ArchaiusHealthStatusFilterModule extends AbstractModule {
     public HealthStatusInclusionConfiguration healthConfiguration(ConfigProxyFactory factory) {
         return factory.newProxy(HealthStatusInclusionConfiguration.class);
     }
-    
+
     @Provides
     @Singleton
     public IndicatorMatcher IndicatorMatcher(HealthStatusInclusionConfiguration config) {
@@ -66,7 +66,7 @@ public class ArchaiusHealthStatusFilterModule extends AbstractModule {
                     .matches(indicator);
         }
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         return obj != null && getClass().equals(obj.getClass());

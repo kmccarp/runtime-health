@@ -69,32 +69,32 @@ public class HealthModule extends AbstractModule {
      * Override to provide custom {@link HealthIndicator}s
      */
     protected void configureHealth() {
-    };
-    
+    }
+
     final protected LinkedBindingBuilder<HealthIndicator> bindAdditionalHealthIndicator() {
         return Multibinder.newSetBinder(binder(), HealthIndicator.class).addBinding();
     }
 
     private final static class InternalHealthModule extends AbstractModule {
-        
+
         @Provides
         @Singleton
         public HealthAggregatorConfiguration healthConfiguration(ConfigProxyFactory factory) {
             return factory.newProxy(HealthAggregatorConfiguration.class);
         }
-        
+
         @Override
         protected void configure() {
             install(new GuavaApplicationEventModule());
             requireBinding(Key.get(ConfigProxyFactory.class));
             bind(HealthCheckAggregator.class).toProvider(HealthProvider.class).asEagerSingleton();
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             return getClass().equals(obj.getClass());
         }
-        
+
         @Override
         public int hashCode() {
             return getClass().hashCode();
@@ -105,7 +105,7 @@ public class HealthModule extends AbstractModule {
             return "InternalHealthModule[]";
         }
     }
-    
+
     private static class HealthProvider implements Provider<HealthCheckAggregator> {
 
         @Inject(optional = true)

@@ -40,14 +40,14 @@ public class HealthModuleTest {
             healthCallback.inform(Health.healthy().build());
         }
     };
-    
+
     static HealthIndicator unhealthy = new HealthIndicator() {
         @Override
         public void check(HealthIndicatorCallback healthCallback) {
             healthCallback.inform(Health.unhealthy().build());
         }
     };
-    
+
     @Test
     public void testNoIndicators() throws InterruptedException, ExecutionException {
         LifecycleInjector injector = InjectorBuilder.fromModules(new HealthModule(), new ArchaiusModule()).createInjector();
@@ -57,20 +57,20 @@ public class HealthModuleTest {
         assertTrue(healthCheckStatus.isHealthy());
         assertEquals(0, healthCheckStatus.getHealthResults().size());
     }
-    
+
     @Test
     public void testMultipleIndicators() throws InterruptedException, ExecutionException {
-        LifecycleInjector injector = InjectorBuilder.fromModules(new HealthModule(), new ArchaiusModule(), new AbstractModule() {            
+        LifecycleInjector injector = InjectorBuilder.fromModules(new HealthModule(), new ArchaiusModule(), new AbstractModule() {
             @Override
             protected void configure() {
                 Multibinder<HealthIndicator> healthIndicatorBinder = Multibinder.newSetBinder(binder(), HealthIndicator.class);
                 healthIndicatorBinder.addBinding().toInstance(healthy);
             }
-        }, new AbstractModule() {            
+        }, new AbstractModule() {
             @Override
             protected void configure() {
                 Multibinder<HealthIndicator> healthIndicatorBinder = Multibinder.newSetBinder(binder(), HealthIndicator.class);
-                healthIndicatorBinder.addBinding().toInstance(unhealthy); 
+                healthIndicatorBinder.addBinding().toInstance(unhealthy);
             }
         }).createInjector();
         HealthCheckAggregator aggregator = injector.getInstance(HealthCheckAggregator.class);
@@ -79,7 +79,7 @@ public class HealthModuleTest {
         assertFalse(healthCheckStatus.isHealthy());
         assertEquals(2, healthCheckStatus.getHealthResults().size());
     }
-    
+
     @Test
     public void testConfiguringIndicatorsByExtendingHealthModule() throws InterruptedException, ExecutionException {
         LifecycleInjector injector = InjectorBuilder.fromModules(new HealthModule() {
@@ -94,7 +94,7 @@ public class HealthModuleTest {
         assertTrue(healthCheckStatus.isHealthy());
         assertEquals(1, healthCheckStatus.getHealthResults().size());
     }
-    
+
     @Test
     public void testMultipleInstancesOfHealthModuleInstalled() throws InterruptedException, ExecutionException {
         LifecycleInjector injector = InjectorBuilder.fromModules(new HealthModule() {

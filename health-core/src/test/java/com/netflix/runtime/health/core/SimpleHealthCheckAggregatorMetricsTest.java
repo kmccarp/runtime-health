@@ -35,21 +35,22 @@ import com.netflix.spectator.api.DefaultRegistry;
 @RunWith(MockitoJUnitRunner.class)
 public class SimpleHealthCheckAggregatorMetricsTest {
 
-    @Mock ApplicationEventDispatcher dispatcher;
+    @Mock
+    ApplicationEventDispatcher dispatcher;
     DefaultRegistry registry;
     SimpleHealthCheckAggregator aggregator;
-    
+
     @Before
     public void init() {
         this.registry = new DefaultRegistry();
     }
-    
+
     static HealthIndicator nonResponsive = new HealthIndicator() {
         @Override
         public void check(HealthIndicatorCallback healthCallback) {
         }
     };
-        
+
     static HealthIndicator exceptional = new HealthIndicator() {
         @Override
         public void check(HealthIndicatorCallback healthCallback) {
@@ -70,22 +71,22 @@ public class SimpleHealthCheckAggregatorMetricsTest {
             healthCallback.inform(Health.healthy().build());
         }
     };
-    
-    @Test(timeout=1000)
+
+    @Test(timeout = 1000)
     public void testHealthyIsRecorded() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy), 1, TimeUnit.SECONDS, dispatcher, registry);
         aggregator.check().get();
         assertEquals(1, registry.counter("runtime.health", "status", "HEALTHY").count());
     }
-    
-    @Test(timeout=1000)
+
+    @Test(timeout = 1000)
     public void testUnHealthyIsRecorded() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(unhealthy), 1, TimeUnit.SECONDS, dispatcher, registry);
         aggregator.check().get();
         assertEquals(1, registry.counter("runtime.health", "status", "UNHEALTHY").count());
     }
-    
-    @Test(timeout=1000)
+
+    @Test(timeout = 1000)
     public void testTimeoutIsRecorded() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(nonResponsive), 50, TimeUnit.MILLISECONDS, dispatcher, registry);
         aggregator.check().get();

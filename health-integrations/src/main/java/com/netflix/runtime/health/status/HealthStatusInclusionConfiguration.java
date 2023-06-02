@@ -18,12 +18,12 @@ package com.netflix.runtime.health.status;
 import com.netflix.archaius.api.annotations.Configuration;
 import com.netflix.archaius.api.annotations.PropertyName;
 
-@Configuration(prefix="health.status.indicators")
+@Configuration(prefix = "health.status.indicators")
 public interface HealthStatusInclusionConfiguration {
 
-    @PropertyName(name="include")
+    @PropertyName(name = "include")
     String[] includedIndicators();
-        
-    @PropertyName(name="exclude")
+
+    @PropertyName(name = "exclude")
     String[] excludedIndicators();
 }

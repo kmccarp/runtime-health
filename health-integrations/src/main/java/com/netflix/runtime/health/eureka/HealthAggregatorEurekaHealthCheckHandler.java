@@ -29,7 +29,7 @@ public class HealthAggregatorEurekaHealthCheckHandler implements HealthCheckHand
 
     private final HealthCheckAggregator healthCheckAggregator;
     private final IndicatorMatcher matcher;
-    
+
     public HealthAggregatorEurekaHealthCheckHandler(HealthCheckAggregator healthCheckAggregator, IndicatorMatcher matcher) {
         this.healthCheckAggregator = healthCheckAggregator;
         this.matcher = matcher;

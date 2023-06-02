@@ -34,13 +34,17 @@ import com.netflix.runtime.health.core.HealthCheckStatusChangedEvent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EurekaHealthStatusBridgeModuleTest {
-    
+
     Injector injector;
-    @Mock ApplicationInfoManager infoManager;
-    @Mock EurekaClient eurekaClient;
-    @Mock HealthCheckAggregator healthCheckAggregator;
-    @Captor ArgumentCaptor<HealthCheckStatusChangedEvent> healthStatusChangedEventCaptor;
-    
+    @Mock
+    ApplicationInfoManager infoManager;
+    @Mock
+    EurekaClient eurekaClient;
+    @Mock
+    HealthCheckAggregator healthCheckAggregator;
+    @Captor
+    ArgumentCaptor<HealthCheckStatusChangedEvent> healthStatusChangedEventCaptor;
+
     @Test
     public void testHealthCheckHandlerRegistered() {
         InjectorBuilder.fromModules(new EurekaHealthStatusBridgeModule(), new AbstractModule() {

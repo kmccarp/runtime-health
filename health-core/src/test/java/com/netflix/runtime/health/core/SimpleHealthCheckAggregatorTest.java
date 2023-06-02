@@ -35,15 +35,15 @@ import com.netflix.runtime.health.api.HealthIndicatorCallback;
 import com.netflix.runtime.health.api.IndicatorMatchers;
 
 public class SimpleHealthCheckAggregatorTest {
-	
-	SimpleHealthCheckAggregator aggregator;
-	
+
+    SimpleHealthCheckAggregator aggregator;
+
     static HealthIndicator nonResponsive = new HealthIndicator() {
         @Override
         public void check(HealthIndicatorCallback healthCallback) {
         }
     };
-	    
+
     static HealthIndicator exceptional = new HealthIndicator() {
         @Override
         public void check(HealthIndicatorCallback healthCallback) {
@@ -64,90 +64,90 @@ public class SimpleHealthCheckAggregatorTest {
             healthCallback.inform(Health.healthy().build());
         }
     };
-	
-	@Test(timeout=1000)
-	public void testEmptyListIsHealthy() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(new ArrayList<>(), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertTrue(aggregatedHealth.isHealthy());
-		assertEquals(0, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-	}
-	
-	@Test(timeout=1000)
-	public void testAllHealthy() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy,healthy), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertTrue(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-	}
-	
-	@Test(timeout=1000)
-	public void testOneUnheathy() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy,unhealthy), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-	}
-	
-	@Test(timeout=1000)
-	public void testAllUnheathy() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(unhealthy,unhealthy), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-	}
-	
-	@Test(timeout=1000)
-	public void testOneHealthyAndOneExceptional() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy,exceptional), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-	}
-	
-	@Test(timeout=1000)
-	public void testOneHealthyAndOneNonResponsive() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy,nonResponsive), 50, TimeUnit.MILLISECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-		Health failed = aggregatedHealth.getHealthResults().stream().filter(h->!h.isHealthy()).findFirst().get();
-		assertNotNull(failed);
-		assertTrue(failed.getErrorMessage().isPresent());
-		assertEquals("java.util.concurrent.TimeoutException: Timed out waiting for response", failed.getErrorMessage().get());
-	}
 
-	
-	@Test(timeout=1000)
-	public void testWithDetails() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList( 
-				(callback)->callback.inform(Health.healthy().withDetail("foo", "bar").build()),
-				(callback)->callback.inform(Health.unhealthy(new RuntimeException("Boom")).build())), 1, TimeUnit.SECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(2, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-		List<Health> indicators = aggregator.check().get().getHealthResults();
-		assertThat(indicators).flatExtracting(s->s.getDetails().keySet()).contains("foo", "error");
-		assertThat(indicators).flatExtracting(s->s.getDetails().values()).contains("bar", "java.lang.RuntimeException: Boom");
-	}
-	
-	@Test(timeout=1000)
-	public void testClassNameAdded() throws Exception {
-		aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy,unhealthy,nonResponsive), 10, TimeUnit.MILLISECONDS);
-		HealthCheckStatus aggregatedHealth = aggregator.check().get();
-		assertFalse(aggregatedHealth.isHealthy());
-		assertEquals(3, aggregatedHealth.getHealthResults().size());
-		assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
-		assertThat(aggregatedHealth.getHealthResults()).extracting(h->h.getDetails().get("className")).isNotNull();
-	}
-	
+    @Test(timeout = 1000)
+    public void testEmptyListIsHealthy() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(new ArrayList<>(), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertTrue(aggregatedHealth.isHealthy());
+        assertEquals(0, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+    }
+
+    @Test(timeout = 1000)
+    public void testAllHealthy() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, healthy), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertTrue(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+    }
+
+    @Test(timeout = 1000)
+    public void testOneUnheathy() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, unhealthy), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+    }
+
+    @Test(timeout = 1000)
+    public void testAllUnheathy() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(unhealthy, unhealthy), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+    }
+
+    @Test(timeout = 1000)
+    public void testOneHealthyAndOneExceptional() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, exceptional), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+    }
+
+    @Test(timeout = 1000)
+    public void testOneHealthyAndOneNonResponsive() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, nonResponsive), 50, TimeUnit.MILLISECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+        Health failed = aggregatedHealth.getHealthResults().stream().filter(h -> !h.isHealthy()).findFirst().get();
+        assertNotNull(failed);
+        assertTrue(failed.getErrorMessage().isPresent());
+        assertEquals("java.util.concurrent.TimeoutException: Timed out waiting for response", failed.getErrorMessage().get());
+    }
+
+
+    @Test(timeout = 1000)
+    public void testWithDetails() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(
+                (callback) -> callback.inform(Health.healthy().withDetail("foo", "bar").build()),
+                (callback) -> callback.inform(Health.unhealthy(new RuntimeException("Boom")).build())), 1, TimeUnit.SECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(2, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+        List<Health> indicators = aggregator.check().get().getHealthResults();
+        assertThat(indicators).flatExtracting(s -> s.getDetails().keySet()).contains("foo", "error");
+        assertThat(indicators).flatExtracting(s -> s.getDetails().values()).contains("bar", "java.lang.RuntimeException: Boom");
+    }
+
+    @Test(timeout = 1000)
+    public void testClassNameAdded() throws Exception {
+        aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, unhealthy, nonResponsive), 10, TimeUnit.MILLISECONDS);
+        HealthCheckStatus aggregatedHealth = aggregator.check().get();
+        assertFalse(aggregatedHealth.isHealthy());
+        assertEquals(3, aggregatedHealth.getHealthResults().size());
+        assertEquals(0, aggregatedHealth.getSuppressedHealthResults().size());
+        assertThat(aggregatedHealth.getHealthResults()).extracting(h -> h.getDetails().get("className")).isNotNull();
+    }
+
     @Test(timeout = 1000)
     public void testIncludeFilterExcludes() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, unhealthy), 10, TimeUnit.MILLISECONDS);
@@ -159,7 +159,7 @@ public class SimpleHealthCheckAggregatorTest {
         assertEquals(1, aggregatedHealth.getSuppressedHealthResults().size());
         assertThat(aggregatedHealth.getHealthResults()).extracting(h -> h.getDetails().get("className")).isNotNull();
     }
-    
+
     @Test(timeout = 1000)
     public void testIncludeFilterIncludes() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, unhealthy, nonResponsive), 10, TimeUnit.MILLISECONDS);
@@ -171,7 +171,7 @@ public class SimpleHealthCheckAggregatorTest {
         assertEquals(2, aggregatedHealth.getSuppressedHealthResults().size());
         assertThat(aggregatedHealth.getHealthResults()).extracting(h -> h.getDetails().get("className")).isNotNull();
     }
-    
+
     @Test(timeout = 1000)
     public void testIncludeFilterIncludesAndExcludes() throws Exception {
         aggregator = new SimpleHealthCheckAggregator(Arrays.asList(healthy, unhealthy, nonResponsive), 10, TimeUnit.MILLISECONDS);
