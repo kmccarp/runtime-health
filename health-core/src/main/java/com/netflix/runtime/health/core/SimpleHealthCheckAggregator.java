@@ -74,21 +74,15 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
         this.indicators = new ArrayList<>(indicators);
         this.maxWaitTime = maxWaitTime;
         this.units = units;
-        this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {  
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "healthIndicatorMonitor");
-                thread.setDaemon(true);
-                return thread;
-            }
+        this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread thread = new Thread(r, "healthIndicatorMonitor");
+            thread.setDaemon(true);
+            return thread;
         });
-        this.healthCheckExecutor = Executors.newFixedThreadPool(HEALTH_CHECK_EXECUTOR_POOL_SIZE, new ThreadFactory() {  
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "healthIndicatorExecutor");
-                thread.setDaemon(true);
-                return thread;
-            }
+        this.healthCheckExecutor = Executors.newFixedThreadPool(HEALTH_CHECK_EXECUTOR_POOL_SIZE, r -> {
+            Thread thread = new Thread(r, "healthIndicatorExecutor");
+            thread.setDaemon(true);
+            return thread;
         });
         this.eventDispatcher = eventDispatcher;
         this.previousHealth = new AtomicBoolean();
@@ -102,7 +96,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
 
     public CompletableFuture<HealthCheckStatus> check(IndicatorMatcher matcher) {
         final List<HealthIndicatorCallbackImpl> callbacks = new ArrayList<>(indicators.size());
-        final CompletableFuture<HealthCheckStatus> future = new CompletableFuture<HealthCheckStatus>();
+        final CompletableFuture<HealthCheckStatus> future = new CompletableFuture<>();
         final AtomicInteger counter = new AtomicInteger(indicators.size());
         
         if (eventDispatcher != null) {
@@ -137,17 +131,14 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
             
         }).collect(Collectors.toList());
                 
-        if(indicators.size() == 0) {
+        if(indicators.isEmpty()) {
         	future.complete(HealthCheckStatus.create(true, Collections.emptyList()));
         }
         
         if (maxWaitTime != 0 && units != null) {
-            scheduledExecutor.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    future.complete(getStatusFromCallbacks(callbacks));
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).cancel(true);
-                }
+            scheduledExecutor.schedule(() -> {
+                future.complete(getStatusFromCallbacks(callbacks));
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).cancel(true);
             }, maxWaitTime, units);
         }
 
@@ -180,7 +171,7 @@ public class SimpleHealthCheckAggregator implements HealthCheckAggregator, Close
 		    	    return health;
 		    	}
 		    })
-		    .map(health -> health.isHealthy())
+		    .map(Health::isHealthy)
 		    .reduce(true, (a,b) -> a && b); 
 	    return HealthCheckStatus.create(isHealthy, healths, suppressedHealths);
 	}
